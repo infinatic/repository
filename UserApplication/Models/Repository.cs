@@ -1,35 +1,46 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Web;
 
 namespace UserApplication.Models
 {
-    public class Repository
+    public abstract class Repository<TEntity>
+        where TEntity : class, new()
     {
         public IList<TEntity> FindBy(string key, string value)
         {
             IList<TEntity> result = new List<TEntity>();
+
+            string query = "select * from dbo.[User] Where "+key+" = @value";
+
+            using (SqlConnection connection = GetTestDbConnection())
+            {
+                SqlCommand command = new SqlCommand(query, connection);
+                command.Parameters.AddWithValue("@value", value);
+
+                connection.Open();
+                SqlDataReader reader = command.ExecuteReader();
+                while (reader.Read())
+                {
+                    result.Add(Map(reader));
+                }
+                reader.Close();
+
+            }
             return result;
         }
 
-        /// <summary>
-        /// This method converts a list of database entries to its specific kind of entity
-        /// using the EntityMappings configured for the repository
-        /// </summary>
-        /// <param name="list">The list of rows to be converted</param>
-        /// <returns>The corresponding list of entities</returns>
-        protected virtual IList<TEntity> ToEntity(IList<TRow> list)
+        public SqlConnection GetTestDbConnection()
         {
-            IList<TEntity> entityList = new List<TEntity>();
-
-            foreach (var item in list)
-            {
-                entityList.Add(Mapping.Create(item));
-            }
-
-            return entityList;
+            string connectionString =
+                "Data Source=(localdb)\\Projects;Initial Catalog=UserDatabase;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False";
+            return new SqlConnection(connectionString);
         }
+
+        abstract public TEntity Map(IDataRecord record);
     }
 }

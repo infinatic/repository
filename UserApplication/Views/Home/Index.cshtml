@@ -3,6 +3,9 @@
 }
 
 <div class="jumbotron">
-    <p>Name: @ViewBag.user.Name</p>
-    <p>Name: @ViewBag.user.Email</p>
+    @foreach(var user in ViewBag.users)
+    {
+        <p>Name:  @user.Name</p>
+        <p>Email: @user.Email</p>
+    }
 </div>

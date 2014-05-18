@@ -13,3 +13,5 @@ bin/
 obj/
 **/*.txt
 _Re*
+*.ldf
+*.mdf

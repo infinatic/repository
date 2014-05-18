@@ -12,28 +12,10 @@ namespace UserApplication.Controllers
     {
         public ActionResult Index()
         {
-            User user = new User();
-            user.Name = "The Author";
-            user.Email = "info@infinatic.de";
+            UserRepository userRepo = new UserRepository();
+            IList<User> users = userRepo.FindBy("name", "paul");
 
-            UserRepository repository = new UserRepository();
-            List<IEntity> users = repository.FindBy("name", "paul");
-
-            ViewBag.user = user;
-            return View();
-        }
-
-        public ActionResult About()
-        {
-            ViewBag.Message = "Your application description page.";
-
-            return View();
-        }
-
-        public ActionResult Contact()
-        {
-            ViewBag.Message = "Your contact page.";
-
+            ViewBag.users = users;
             return View();
         }
     }

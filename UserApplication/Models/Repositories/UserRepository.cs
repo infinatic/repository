@@ -1,43 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Web;
 using UserApplication.Models;
 
 namespace UserApplication.Models.Repositories
 {
-    public class UserRepository : Repository
+    public class UserRepository : Repository<User>
     {
-        private readonly List<User> _users;
-
-        public UserRepository()
-        {
-            _users = FakeDatabase.GetAllPeople();
-        }
-
-        public void Add(User User)
-        {
-            _users.Add(User);
-        }
-
-        public void Remove(User User)
-        {
-            _users.Remove(User);
-        }
-
-        // könnte FindBy(string key, value) sein
-        public IEnumerable<User> Find(Func<User, bool> predicate)
-        {
-            return _users.Where(predicate);
-        }
-
-        /// <summary>
-        /// <para>
-        /// This method will persist (create or update) an entity on the database
-        /// using an auto-commit transaction
-        /// </para>
-        /// </summary>
-        /// <param name="entity">The entity that is going to be persisted</param>
         public void Save(User user)
         {
             if (user == null)
@@ -48,22 +20,42 @@ namespace UserApplication.Models.Repositories
 
             if(user.Id == null)
             {
-                Create(user);
+                Create(user, this.GetTestDbConnection());
             }
             else
             {
-                Update(user);
+                Update(user, this.GetTestDbConnection());
             }
         }
 
-        private void Update(User user)
+        private void Create(User user, SqlConnection connection)
         {
             throw new NotImplementedException();
         }
 
-        private void Create(User user)
+        private void Update(User user, SqlConnection connection)
         {
             throw new NotImplementedException();
+        }
+
+        /// <summary>
+        ///     Defines how to create entity object from database result.
+        /// </summary>
+        /// <param name="record"></param>
+        /// <returns></returns>
+        public override User Map(IDataRecord record)
+        {
+            User u = new User();
+            u.Id = (DBNull.Value == record["Id"]) ?
+                null : (int?)record["Id"];
+
+            u.Name = (DBNull.Value == record["name"]) ?
+                string.Empty : (string)record["name"];
+
+            u.Email = (DBNull.Value == record["email"]) ?
+                string.Empty : (string)record["email"];
+
+            return u;
         }
     }
 }
