@@ -1,0 +1,15 @@
+bin
+*.suo
+*.user
+*.pdb
+obj
+*.stackdump
+TestResults/**
+*.Cache
+*.manifest
+*.cache
+*.log
+bin/
+obj/
+**/*.txt
+_Re*
