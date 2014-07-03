@@ -14,7 +14,6 @@ namespace UserApplication.Controllers
         {
             UserRepository userRepo = new UserRepository();
             IList<User> users = userRepo.FindBy("name", "paul");
-
             ViewBag.users = users;
             return View();
         }

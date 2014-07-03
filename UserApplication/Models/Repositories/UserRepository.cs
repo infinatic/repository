@@ -8,34 +8,28 @@ using UserApplication.Models;
 
 namespace UserApplication.Models.Repositories
 {
-    public class UserRepository : Repository<User>
+    public class UserRepository : BaseRepository<User>
     {
-        public void Save(User user)
-        {
-            if (user == null)
+        public override string Tablename { 
+            get
             {
-                throw new ArgumentNullException(
-                    "Entity can't be null");
-            }
-
-            if(user.Id == null)
-            {
-                Create(user, this.GetTestDbConnection());
-            }
-            else
-            {
-                Update(user, this.GetTestDbConnection());
+                return "User";
             }
         }
 
-        private void Create(User user, SqlConnection connection)
+        public override void Insert(User user)
         {
             throw new NotImplementedException();
         }
 
-        private void Update(User user, SqlConnection connection)
+        public override void Update(User user)
         {
             throw new NotImplementedException();
+        }
+
+        public override bool IsEntityNew(User user)
+        {
+            return true;
         }
 
         /// <summary>
@@ -46,15 +40,9 @@ namespace UserApplication.Models.Repositories
         public override User Map(IDataRecord record)
         {
             User u = new User();
-            u.Id = (DBNull.Value == record["Id"]) ?
-                null : (int?)record["Id"];
-
-            u.Name = (DBNull.Value == record["name"]) ?
-                string.Empty : (string)record["name"];
-
-            u.Email = (DBNull.Value == record["email"]) ?
-                string.Empty : (string)record["email"];
-
+            u.Id = (int)record["Id"];
+            u.Name = record["name"] as string;
+            u.Email = record["email"] as string;
             return u;
         }
     }

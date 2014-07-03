@@ -8,14 +8,17 @@ using System.Web;
 
 namespace UserApplication.Models
 {
-    public abstract class Repository<TEntity>
+    public abstract class BaseRepository<TEntity>
         where TEntity : class, new()
     {
+        public abstract string Tablename { get; }
+
         public IList<TEntity> FindBy(string key, string value)
         {
             IList<TEntity> result = new List<TEntity>();
 
-            string query = "select * from dbo.[User] Where "+key+" = @value";
+            // TODO have to pass the key as param 
+            string query = "select * from " + this.Tablename + " Where " + key + " = @value";
 
             using (SqlConnection connection = GetTestDbConnection())
             {
@@ -26,13 +29,26 @@ namespace UserApplication.Models
                 SqlDataReader reader = command.ExecuteReader();
                 while (reader.Read())
                 {
-                    result.Add(Map(reader));
+                    result.Add(this.Map(reader));
                 }
                 reader.Close();
-
             }
             return result;
         }
+
+
+        public void Save(TEntity entity)
+        {
+            if (this.IsEntityNew(entity))
+            {
+                this.Insert(entity);
+            }
+            else
+            {
+                this.Update(entity);
+            }
+        }
+
 
         public SqlConnection GetTestDbConnection()
         {
@@ -41,6 +57,9 @@ namespace UserApplication.Models
             return new SqlConnection(connectionString);
         }
 
-        abstract public TEntity Map(IDataRecord record);
+        public abstract TEntity Map(IDataRecord record);
+        public abstract void Update(TEntity entity);
+        public abstract void Insert(TEntity entity);
+        public abstract bool IsEntityNew(TEntity entity);
     }
 }
